@@ -1,18 +1,40 @@
 const { Router } = require("express");
-const { auth } = require("./../firebase");
+const { db, auth } = require("./../firebase");
 
 const router = new Router();
 
-// On POST > create hamster
-router.post("/hamsters", async (req, res) => {
+// GET all hamsters
+router.get("/hamsters", async (req, res) => {
   try {
-    // Create new hamster
-    await auth.createUser(req.body);
+    const hamstersArray = [];
+    const snapShot = await db.collection("hamsters").get();
 
-    // Tell client that all is ok
-    res.send({ msg: "Hamster has been created" });
+    snapShot.forEach((doc) => {
+      hamstersArray.push(doc.data());
+    });
+
+    res.send({ hamsters: hamstersArray });
   } catch (err) {
-    res.status(500).send(err);
+    console.error(err);
+  }
+});
+
+// GET hamster with specified ID
+router.get("/hamsters/:id", async (req, res) => {
+  try {
+    const snapShot = await db
+      .collection("hamsters")
+      .where(
+        firebase.firestore.FieldPath.documentId(),
+        "==",
+        parseInt(req.params.id)
+      )
+      .get();
+    console.log(snapShot.data());
+
+    res.send({ hamster: snapShot });
+  } catch (err) {
+    console.error(err);
   }
 });
 

@@ -1,8 +1,7 @@
 const { db } = require("./firebase");
 const hamsters = require("./data.json");
 
-// Selv-invoking at server start
-const addHamstersToDatabase = (() => {
+const addHamstersToDatabase = () => {
   try {
     hamsters.forEach((hamster) => {
       db.collection("hamsters").doc(hamster.id.toString()).set(hamster);
@@ -11,6 +10,6 @@ const addHamstersToDatabase = (() => {
   } catch (err) {
     console.error(err.message);
   }
-})();
+};
 
 module.exports = addHamstersToDatabase;

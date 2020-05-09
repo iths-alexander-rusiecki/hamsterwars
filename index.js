@@ -1,5 +1,5 @@
 const express = require("express");
-const addHamstersToDatabase = require("./addHamstersToDatabase");
+const doesCollectionExist = require("./doesCollectionExist");
 
 const app = express();
 
