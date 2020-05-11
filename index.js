@@ -1,9 +1,9 @@
 const express = require("express");
 const doesCollectionExist = require("./doesCollectionExist");
 
-const app = express();
-
 const PORT = process.env.PORT || 3000;
+
+const app = express();
 
 app.use(express.static("public"));
 app.use(express.json());
