@@ -1,5 +1,6 @@
 const { db } = require("./../firebase");
 const { Router } = require("express");
+var converter = require("number-to-words"); // Just testing for fun
 
 const router = new Router();
 
@@ -13,6 +14,19 @@ router.get("/", async (req, res) => {
   });
 
   res.send({ hamsters: hamstersArray });
+});
+
+// GET hamster with specified ID
+router.get("/:id", async (req, res) => {
+  const hamsterArray = [];
+  const snapShot = await db
+    .collection("hamsters")
+    .where("id", "==", parseInt(req.params.id))
+    .get();
+  snapShot.forEach((doc) => {
+    hamsterArray.push(doc.data());
+  });
+  res.send({ hamster: hamsterArray });
 });
 
 // PUT (glöm ej att fixa total games här)
@@ -31,7 +45,11 @@ router.put("/:id/results", async (req, res) => {
       db.collection("hamsters")
         .doc(doc.id)
         .set(hamster)
-        .then(res.send({ msg: "Hamster updated" }))
+        .then(
+          res.send({
+            msg: `Hamster ${converter.toWords(req.params.id)} updated`,
+          })
+        )
         .catch((err) => {
           throw err;
         });
