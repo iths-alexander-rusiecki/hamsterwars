@@ -1,116 +1,132 @@
 const { db } = require("./../firebase");
 const { Router } = require("express");
 const fs = require("fs");
-var converter = require("number-to-words"); // Just testing for fun
+const converter = require("number-to-words"); // Just testing package for fun
 
 const router = new Router();
 
+const hamstersRef = db.collection("hamsters"); // DRY code
+
 // GET all hamsters
 router.get("/", async (req, res) => {
-  const hamstersArray = [];
-  const snapShot = await db.collection("hamsters").get();
-
-  snapShot.forEach((doc) => {
-    hamstersArray.push(doc.data());
-  });
-
-  res.send({ hamsters: hamstersArray });
+  try {
+    const hamstersArray = [];
+    const snapShot = await hamstersRef.get();
+    snapShot.forEach((doc) => {
+      hamstersArray.push(doc.data());
+    });
+    res.send({ allHamsters: hamstersArray });
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 // GET hamster picture
 router.get("/assets/:picUrl", (req, res) => {
-  let picUrl = req.params.picUrl;
-  let src = fs.createReadStream(`./public/hamsters/${picUrl}`);
-  src.pipe(res);
-});
-// GET hamster with specified ID
-router.get("/:id", async (req, res) => {
-  const hamsterArray = [];
-  const snapShot = await db
-    .collection("hamsters")
-    .where("id", "==", parseInt(req.params.id))
-    .get();
-  snapShot.forEach((doc) => {
-    hamsterArray.push(doc.data());
-  });
-  res.send({ hamster: hamsterArray });
-});
-// GET top 5 hamsters by wins
-router.get("/charts/top", async (req, res) => {
-  const hamsterArray = [];
-  let sortedArray = [];
-  let topFiveWinsArray = [];
-  const snapShot = await db.collection("hamsters").get();
-  snapShot.forEach((doc) => {
-    hamsterArray.push(doc.data());
-  });
-  sortedArray = hamsterArray.sort((a, b) => a.wins + b.wins);
-  topFiveWinsArray = sortedArray.slice(0, 5);
-  res.send({ topFiveHamsters: topFiveWinsArray });
-});
-// GET top 5 hamsters by defeats
-router.get("/charts/bottom", async (req, res) => {
-  const hamsterArray = [];
-  let sortedArray = [];
-  let topFivedefeatsArray = [];
-  const snapShot = await db.collection("hamsters").get();
-  snapShot.forEach((doc) => {
-    hamsterArray.push(doc.data());
-  });
-  sortedArray = hamsterArray.sort((a, b) => a.defeats + b.defeats);
-  topFivedefeatsArray = sortedArray.slice(0, 5);
-  res.send({ bottomFiveHamsters: topFivedefeatsArray });
+  try {
+    const picUrl = req.params.picUrl;
+    const src = fs.createReadStream(`./public/hamsters/${picUrl}`);
+    src.pipe(res);
+  } catch (err) {
+    console.error(err);
+  }
 });
 
-// PUT stats to hamster with specified ID
-let totalGames = 0;
-router.put("/:id/results", async (req, res) => {
+// GET hamster with specified ID
+router.get("/:id", async (req, res) => {
   try {
-    let snapShot = await db
-      .collection("hamsters")
+    const specifiedByIdHamsterArray = [];
+    const snapShot = await hamstersRef
       .where("id", "==", parseInt(req.params.id))
       .get();
     snapShot.forEach((doc) => {
-      totalGames++;
+      specifiedByIdHamsterArray.push(doc.data());
+    });
+    res.send({ SpecificHamster: specifiedByIdHamsterArray });
+  } catch (err) {
+    console.error(err);
+  }
+});
 
-      let hamster = doc.data();
-      hamster.defeats += parseInt(req.body.defeats);
-      hamster.games += parseInt(req.body.games);
-      hamster.wins += parseInt(req.body.wins);
+// GET five hamsters by wins
+router.get("/charts/top", async (req, res) => {
+  try {
+    const topFiveHamstersArray = [];
+    const snapShot = await hamstersRef.orderBy("wins", "desc").limit(5).get();
+    snapShot.forEach((doc) => {
+      topFiveHamstersArray.push(doc.data());
+    });
+    res.send({ topFiveHamsters: topFiveHamstersArray });
+  } catch (err) {
+    console.error(err);
+  }
+});
 
-      db.collection("hamsters")
+// GET five hamsters by defeats
+router.get("/charts/bottom", async (req, res) => {
+  try {
+    const bottomFiveHamstersArray = [];
+    const snapShot = await hamstersRef
+      .orderBy("defeats", "desc")
+      .limit(5)
+      .get();
+    snapShot.forEach((doc) => {
+      bottomFiveHamstersArray.push(doc.data());
+    });
+    res.send({ bottomFiveHamsters: bottomFiveHamstersArray });
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+// PUT stats to hamster with specified ID
+router.put("/:id/results", async (req, res) => {
+  try {
+    const snapShot = await hamstersRef
+      .where("id", "==", parseInt(req.params.id))
+      .get();
+    snapShot.forEach((doc) => {
+      const hamster = doc.data();
+      if (parseInt(req.body.wins) > 0) {
+        hamster.wins++;
+      }
+      if (parseInt(req.body.defeats) > 0) {
+        hamster.defeats++;
+      }
+      hamster.games++;
+      hamstersRef
         .doc(doc.id)
         .set(hamster)
         .then(
           res.send({
             msg: `Hamster ${converter.toWords(
               req.params.id
-            )} game stats updated (tatal games: ${totalGames})`,
+            )} game stats updated`,
           })
         )
-
         .catch((err) => {
           throw err;
         });
     });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send(err.message);
+    console.error(err);
+    res.status(500).send(err);
   }
 });
 
 // GET random hamster
 router.get("/hamsters/random", async (req, res) => {
-  const hamstersArray = [];
-  const randomNumber = Math.floor(Math.random() * 40) + 1;
-  const snapShot = await db
-    .collection("hamsters")
-    .where("id", "==", randomNumber)
-    .get();
-  snapShot.forEach((doc) => {
-    hamstersArray.push(doc.data());
-  });
-  res.send({ hamster: hamstersArray });
+  try {
+    const randomHamsterArray = [];
+    const randomNumber = Math.floor(Math.random() * 40) + 1;
+    const snapShot = await hamstersRef.where("id", "==", randomNumber).get();
+    snapShot.forEach((doc) => {
+      randomHamsterArray.push(doc.data());
+    });
+    res.send({ randomHamster: randomHamsterArray });
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 module.exports = router;
