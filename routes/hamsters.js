@@ -17,12 +17,12 @@ router.get("/", async (req, res) => {
   res.send({ hamsters: hamstersArray });
 });
 
-// POST hamster pictures
-router.get("/assets", (req, res) => {
-  let src = fs.createReadStream("./hamsters/hamster-1.jpg");
+// GET hamster picture
+router.get("/assets/:picUrl", (req, res) => {
+  let picUrl = req.params.picUrl;
+  let src = fs.createReadStream(`./public/hamsters/${picUrl}`);
   src.pipe(res);
 });
-
 // GET hamster with specified ID
 router.get("/:id", async (req, res) => {
   const hamsterArray = [];
