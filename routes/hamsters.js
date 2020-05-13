@@ -21,17 +21,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET hamster picture
-router.get("/assets/:picUrl", (req, res) => {
-  try {
-    const picUrl = req.params.picUrl;
-    const src = fs.createReadStream(`./assets/hamsters/${picUrl}`);
-    src.pipe(res);
-  } catch (err) {
-    console.error(err);
-  }
-});
-
 // GET hamster with specified ID
 router.get("/:id", async (req, res) => {
   try {
@@ -41,37 +30,6 @@ router.get("/:id", async (req, res) => {
     snapShot.forEach((doc) => {
       res.send({ SpecificHamster: doc.data() });
     });
-  } catch (err) {
-    console.error(err);
-  }
-});
-
-// GET five hamsters by wins
-router.get("/charts/top", async (req, res) => {
-  try {
-    const topFiveHamstersArray = [];
-    const snapShot = await hamstersRef.orderBy("wins", "desc").limit(5).get();
-    snapShot.forEach((doc) => {
-      topFiveHamstersArray.push(doc.data());
-    });
-    res.send({ topFiveHamsters: topFiveHamstersArray });
-  } catch (err) {
-    console.error(err);
-  }
-});
-
-// GET five hamsters by defeats
-router.get("/charts/bottom", async (req, res) => {
-  try {
-    const bottomFiveHamstersArray = [];
-    const snapShot = await hamstersRef
-      .orderBy("defeats", "desc")
-      .limit(5)
-      .get();
-    snapShot.forEach((doc) => {
-      bottomFiveHamstersArray.push(doc.data());
-    });
-    res.send({ bottomFiveHamsters: bottomFiveHamstersArray });
   } catch (err) {
     console.error(err);
   }

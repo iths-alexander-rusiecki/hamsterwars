@@ -1,7 +1,5 @@
 const { db } = require("./../firebase");
 const { Router } = require("express");
-const fs = require("fs");
-const converter = require("number-to-words"); // Just testing package for fun
 
 const router = new Router();
 
@@ -15,10 +13,28 @@ router.get("/", async (req, res) => {
     snapShot.forEach((doc) => {
       totalGamesPlayedArray.push(doc.data());
     });
-    res.send({ totalGamesPlayed: totalGamesPlayedArray });
+    res.send({ gamesPlayed: totalGamesPlayedArray });
   } catch (err) {
     console.error(err);
   }
+});
+
+// POST new game
+router.post("/", async (req, res) => {
+  const now = new Date();
+  console.log(now.toLocaleString());
+
+  const snapShot = await hamstersRef.get();
+  snapShot.forEach((doc) => {
+    const hamster = doc.data();
+    if (hamster.id == req.body.id) {
+      snapShot.set({
+        wins: req.body.wins,
+        defeats: req.body.defeats,
+      });
+    }
+  });
+  res.send({ msg: "Game added" });
 });
 
 module.exports = router;
