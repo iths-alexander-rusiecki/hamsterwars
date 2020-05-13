@@ -70,7 +70,7 @@ router.put("/:id/results", async (req, res) => {
           res.send({
             msg: `Hamster ${converter.toWords(
               req.params.id
-            )} game stats updated`,
+            )}´s game stats updated`,
           })
         )
         .catch((err) => {

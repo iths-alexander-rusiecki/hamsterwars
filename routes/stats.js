@@ -1,7 +1,5 @@
 const { db } = require("./../firebase");
 const { Router } = require("express");
-// const fs = require("fs");
-// const converter = require("number-to-words"); // Just testing package for fun
 
 const router = new Router();
 
