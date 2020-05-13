@@ -25,7 +25,7 @@ router.get("/", async (req, res) => {
 router.get("/assets/:picUrl", (req, res) => {
   try {
     const picUrl = req.params.picUrl;
-    const src = fs.createReadStream(`./public/hamsters/${picUrl}`);
+    const src = fs.createReadStream(`./assets/hamsters/${picUrl}`);
     src.pipe(res);
   } catch (err) {
     console.error(err);
@@ -35,14 +35,12 @@ router.get("/assets/:picUrl", (req, res) => {
 // GET hamster with specified ID
 router.get("/:id", async (req, res) => {
   try {
-    const specifiedByIdHamsterArray = [];
     const snapShot = await hamstersRef
       .where("id", "==", parseInt(req.params.id))
       .get();
     snapShot.forEach((doc) => {
-      specifiedByIdHamsterArray.push(doc.data());
+      res.send({ SpecificHamster: doc.data() });
     });
-    res.send({ SpecificHamster: specifiedByIdHamsterArray });
   } catch (err) {
     console.error(err);
   }
@@ -117,13 +115,11 @@ router.put("/:id/results", async (req, res) => {
 // GET random hamster
 router.get("/hamsters/random", async (req, res) => {
   try {
-    const randomHamsterArray = [];
     const randomNumber = Math.floor(Math.random() * 40) + 1;
     const snapShot = await hamstersRef.where("id", "==", randomNumber).get();
     snapShot.forEach((doc) => {
-      randomHamsterArray.push(doc.data());
+      res.send({ randomHamster: doc.data() });
     });
-    res.send({ randomHamster: randomHamsterArray });
   } catch (err) {
     console.error(err);
   }
