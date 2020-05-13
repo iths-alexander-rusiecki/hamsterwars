@@ -7,6 +7,19 @@ const router = new Router();
 
 const hamstersRef = db.collection("hamsters"); // DRY code
 
+// GET random hamster
+router.get("/random", async (req, res) => {
+  try {
+    const randomNumber = Math.floor(Math.random() * 40) + 1;
+    const snapShot = await hamstersRef.where("id", "==", randomNumber).get();
+    snapShot.forEach((doc) => {
+      res.send({ randomHamster: doc.data() });
+    });
+  } catch (err) {
+    console.error(err);
+  }
+});
+
 // GET all hamsters
 router.get("/", async (req, res) => {
   try {
@@ -67,19 +80,6 @@ router.put("/:id/results", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send(err);
-  }
-});
-
-// GET random hamster
-router.get("/hamsters/random", async (req, res) => {
-  try {
-    const randomNumber = Math.floor(Math.random() * 40) + 1;
-    const snapShot = await hamstersRef.where("id", "==", randomNumber).get();
-    snapShot.forEach((doc) => {
-      res.send({ randomHamster: doc.data() });
-    });
-  } catch (err) {
-    console.error(err);
   }
 });
 

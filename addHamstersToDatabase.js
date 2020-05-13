@@ -9,7 +9,7 @@ const addHamstersToDatabase = () => {
       console.log(`Hamster ${hamster.name} added to hamsters collection`);
     });
   } catch (err) {
-    console.error(err.message);
+    console.error(err);
   }
 };
 

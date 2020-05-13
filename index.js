@@ -8,7 +8,7 @@ const app = express();
 
 app.use(helmet());
 app.use(express.static("public"));
-app.use(express.static("assets"));
+// app.use("/assets", express.static("assets"));
 app.use(express.json());
 
 const assetsRoute = require("./routes/assets");
