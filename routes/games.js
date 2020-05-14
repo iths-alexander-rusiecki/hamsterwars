@@ -24,9 +24,9 @@ const doesCollectionExist = (async () => {
             favFood: "",
             loves: "",
             imgName: "",
-            wins: null,
-            defeats: null,
-            games: null,
+            wins: 0,
+            defeats: 0,
+            games: 0,
           },
           {
             id: null,
@@ -35,9 +35,9 @@ const doesCollectionExist = (async () => {
             favFood: "",
             loves: "",
             imgName: "",
-            wins: null,
-            defeats: null,
-            games: null,
+            wins: 0,
+            defeats: 0,
+            games: 0,
           },
         ],
         winner: "",
@@ -61,17 +61,25 @@ router.post("/", async (req, res) => {
       game.contestants[0].imgName = req.body.contestants[0].imgName;
       game.contestants[0].favFood = req.body.contestants[0].favFood;
       game.contestants[0].loves = req.body.contestants[0].loves;
-      game.contestants[0].wins += parseInt(req.body.contestants[0].wins);
-      game.contestants[0].defeats += parseInt(req.body.contestants[0].defeats);
-      game.contestants[0].games += parseInt(req.body.contestants[0].games);
+      if (parseInt(req.body.contestants[0].wins) > 0) {
+        game.contestants[0].wins++;
+      }
+      if (parseInt(req.body.contestants[0].defeats) > 0) {
+        game.contestants[0].defeats++;
+      }
+      game.contestants[0].games++;
       game.contestants[1].id = parseInt(req.body.contestants[1].id);
       game.contestants[1].name = req.body.contestants[1].name;
       game.contestants[1].imgName = req.body.contestants[1].imgName;
       game.contestants[1].favFood = req.body.contestants[1].favFood;
       game.contestants[1].loves = req.body.contestants[1].loves;
-      game.contestants[1].wins += parseInt(req.body.contestants[1].wins);
-      game.contestants[1].defeats += parseInt(req.body.contestants[1].defeats);
-      game.contestants[1].games += parseInt(req.body.contestants[1].games);
+      if (parseInt(req.body.contestants[1].wins) > 0) {
+        game.contestants[1].wins++;
+      }
+      if (parseInt(req.body.contestants[1].defeats) > 0) {
+        game.contestants[1].defeats++;
+      }
+      game.contestants[1].games++;
       game.winner = req.body.winner;
       gamesRef
         .doc(doc.id)
