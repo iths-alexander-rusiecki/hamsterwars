@@ -17,7 +17,7 @@ const chartsRoute = require("./routes/charts");
 app.use("/charts", chartsRoute);
 
 const gamesRoute = require("./routes/games");
-app.use("/", gamesRoute);
+app.use("/games", gamesRoute);
 
 const hamstersRoute = require("./routes/hamsters");
 app.use("/hamsters", hamstersRoute);

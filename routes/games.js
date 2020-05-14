@@ -47,7 +47,7 @@ const doesCollectionExist = (async () => {
   });
 })();
 
-router.post("/results", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const snapShot = await gamesRef.get();
     snapShot.forEach((doc) => {
