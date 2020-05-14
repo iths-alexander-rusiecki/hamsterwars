@@ -1,6 +1,7 @@
 const { db } = require("./firebase");
 const addHamstersToDatabase = require("./addHamstersToDatabase");
 
+// Self invoking function on server start. Checks if collection exists, if not creates one.
 const doesCollectionExist = (async () => {
   await db
     .collection("hamsters")
@@ -10,6 +11,8 @@ const doesCollectionExist = (async () => {
         return;
       } else {
         console.log("Hamster collection created");
+
+        // Create collection
         addHamstersToDatabase();
       }
     });

@@ -1,52 +1,82 @@
 const { db } = require("./../firebase");
 const { Router } = require("express");
-const uuid = require("uuid");
+const uuid = require("uuid"); // Creates good unique ID´s
 
 const router = new Router();
 
 const gamesRef = db.collection("games"); // DRY code
 const hamstersRef = db.collection("hamsters"); // DRY code
 
-const doesCollectionExist = async () => {
+const doesCollectionExist = (async () => {
+  // Self invoking function. Checka if games collection exists, if not creates one and add keys/empty values.
   await gamesRef.get().then((query) => {
     if (query.size > 0) {
       return;
     } else {
       gamesRef.doc(uuid.v4()).set({
-        id: 1,
+        id: null,
         timeStamp: null,
-        hamsterOne: { name: "", wins: 0, defeats: 0, games: 0 },
-        hamsterTwo: { name: "", wins: 0, defeats: 0, games: 0 },
+        contestants: [
+          {
+            id: null,
+            name: "",
+            imgName: "",
+            favFood: "",
+            loves: "",
+            imgName: "",
+            wins: null,
+            defeats: null,
+            games: null,
+          },
+          {
+            id: null,
+            name: "",
+            imgName: "",
+            favFood: "",
+            loves: "",
+            imgName: "",
+            wins: null,
+            defeats: null,
+            games: null,
+          },
+        ],
         winner: "",
       });
       console.log("Games collection created");
     }
   });
-};
-doesCollectionExist();
+})();
 
-router.post("/:id/results", async (req, res) => {
+router.post("/results", async (req, res) => {
   try {
-    const snapShot = await gamesRef
-      .where("id", "==", parseInt(req.params.id))
-      .get();
+    const snapShot = await gamesRef.get();
     snapShot.forEach((doc) => {
       const game = doc.data();
-      game.timeStamp = new Date();
-      game.hamsterOne.name += req.body.hamsterOne.name;
-      game.hamsterTwo.name += req.body.hamsterTwo.name;
-      game.hamsterOne.wins += req.body.hamsterOne.wins;
-      game.hamsterTwo.wins += req.body.hamsterTwo.wins;
-      game.hamsterOne.defeats += req.body.hamsterOne.defeats;
-      game.hamsterTwo.defeats += req.body.hamsterTwo.defeats;
-      game.hamsterOne.games += req.body.hamsterOne.games;
-      game.hamsterTwo.games += req.body.hamsterTwo.games;
-      game.winner = req.body.winner;
 
+      // Add to object values
+      game.id = parseInt(req.body.id);
+      game.timeStamp = new Date().toLocaleString();
+      game.contestants[0].id = parseInt(req.body.contestants[0].id);
+      game.contestants[0].name = req.body.contestants[0].name;
+      game.contestants[0].imgName = req.body.contestants[0].imgName;
+      game.contestants[0].favFood = req.body.contestants[0].favFood;
+      game.contestants[0].loves = req.body.contestants[0].loves;
+      game.contestants[0].wins += parseInt(req.body.contestants[0].wins);
+      game.contestants[0].defeats += parseInt(req.body.contestants[0].defeats);
+      game.contestants[0].games += parseInt(req.body.contestants[0].games);
+      game.contestants[1].id = parseInt(req.body.contestants[1].id);
+      game.contestants[1].name = req.body.contestants[1].name;
+      game.contestants[1].imgName = req.body.contestants[1].imgName;
+      game.contestants[1].favFood = req.body.contestants[1].favFood;
+      game.contestants[1].loves = req.body.contestants[1].loves;
+      game.contestants[1].wins += parseInt(req.body.contestants[1].wins);
+      game.contestants[1].defeats += parseInt(req.body.contestants[1].defeats);
+      game.contestants[1].games += parseInt(req.body.contestants[1].games);
+      game.winner = req.body.winner;
       gamesRef
         .doc(doc.id)
         .set(game)
-        .then(res.send({ msg: "Game added" }));
+        .then(res.send({ msg: `Game ${req.body.id} added` }));
     });
   } catch (err) {
     console.error(err);
@@ -57,6 +87,8 @@ router.post("/:id/results", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     totalGamesPlayedArray = [];
+
+    // Find where games value > 0
     const snapShot = await hamstersRef.where("games", ">", 0).get();
     snapShot.forEach((doc) => {
       totalGamesPlayedArray.push(doc.data());
@@ -66,23 +98,5 @@ router.get("/", async (req, res) => {
     console.error(err);
   }
 });
-
-// // POST new game
-// router.post("/", async (req, res) => {
-//   const now = new Date();
-//   console.log(now.toLocaleString());
-
-//   const snapShot = await hamstersRef.get();
-//   snapShot.forEach((doc) => {
-//     const hamster = doc.data();
-//     if (hamster.id == req.body.id) {
-//       snapShot.set({
-//         wins: req.body.wins,
-//         defeats: req.body.defeats,
-//       });
-//     }
-//   });
-//   res.send({ msg: "Game added" });
-// });
 
 module.exports = router;

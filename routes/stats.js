@@ -10,6 +10,8 @@ router.get("/total", async (req, res) => {
   try {
     let totalGames = 0;
     const snapShot = await hamstersRef.get();
+
+    // Loops through games, adds value to totalGames
     snapShot.forEach((doc) => {
       totalGames += doc.data().games;
     });

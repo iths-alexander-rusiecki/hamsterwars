@@ -9,6 +9,8 @@ const hamstersRef = db.collection("hamsters"); // DRY code
 router.get("/top", async (req, res) => {
   try {
     const topFiveHamstersArray = [];
+
+    // Firebase query language
     const snapShot = await hamstersRef.orderBy("wins", "desc").limit(5).get();
     snapShot.forEach((doc) => {
       topFiveHamstersArray.push(doc.data());
@@ -23,6 +25,8 @@ router.get("/top", async (req, res) => {
 router.get("/bottom", async (req, res) => {
   try {
     const bottomFiveHamstersArray = [];
+
+    // Firebase query language
     const snapShot = await hamstersRef
       .orderBy("defeats", "desc")
       .limit(5)

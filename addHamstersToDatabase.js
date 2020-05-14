@@ -1,7 +1,8 @@
 const { db } = require("./firebase");
+const uuid = require("uuid"); // Creates good unique ID´s
 const hamsters = require("./data.json");
-const uuid = require("uuid");
 
+// Loops through data.json and adds documents to collection
 const addHamstersToDatabase = () => {
   try {
     hamsters.forEach((hamster) => {
