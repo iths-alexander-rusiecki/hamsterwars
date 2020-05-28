@@ -7,14 +7,15 @@ const gamesRef = db.collection("games"); // DRY code
 const addCollectionToDatabase = collectionName => {
     try {
         if (collectionName === "hamsters") {
+            console.log(`${collectionName} collection created`);
             hamsters.forEach(hamster => {
                 db.collection(collectionName).doc(uuid.v4()).set(hamster);
                 console.log(
                     `${hamster.name} added to ${collectionName} collection`
                 );
             });
-            console.log(`${collectionName} collection created`);
         } else if (collectionName === "games") {
+            console.log(`${collectionName} collection created`);
             gamesRef.doc(uuid.v4()).set({
                 id: null,
                 timeStamp: null,
@@ -44,7 +45,6 @@ const addCollectionToDatabase = collectionName => {
                 ],
                 winner: "",
             });
-            console.log(`${collectionName} collection created`);
         }
     } catch (err) {
         console.error(err);
